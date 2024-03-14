@@ -31,7 +31,7 @@ class GraphiBubbleSort:
         self.arrNumbers = []  # Save numbers 640
         self.isRunALG = False  # program  running?
 
-        self.thread = Thread(target=self.run2)
+        self.thread = Thread(target=self.run)
         """Preparate launch"""
         self.thread.start()
         self.initArrNumbers()
@@ -62,7 +62,7 @@ class GraphiBubbleSort:
     def initArrNumbers(self):
         if not self.isRunALG:
             self.arrNumbers.clear()
-            for i in range(10):
+            for i in range(40):
                 self.arrNumbers.append(randint(1, 999))
 
     def update_graphic(self):
@@ -150,8 +150,9 @@ class GraphiBubbleSort:
                         if self.arrNumbers[j] > self.arrNumbers[j+1]:
                             self._temp = self.arrNumbers[j]
                             self.arrNumbers[j] = self.arrNumbers[j+1]
-                            self.arrNumbers[j] = self._temp
-                        sleep(self._sleepTime) 
+                            self.arrNumbers[j+1] = self._temp
+                        sleep(self._sleepTime)
+                        self.iterator = self.iterator + 1
 
                 self.isRunALG = False
 
