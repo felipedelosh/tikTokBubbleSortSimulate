@@ -2,7 +2,7 @@
 <br>
 <h4>TikTok Bubble Sort and others sorts</h4>
 
-![Banner](docs/banner.png)
+![Banner](Docs/banner.png)
 :construction: Status of projecgitt :construction:
 <br><br>
 I try to see with my eyes how to do sort algorithms
