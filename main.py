@@ -13,7 +13,7 @@ from threading import *
 from time import sleep
 
 
-class GraphiBubbleSort:
+class GraphicSortAGL:
     def __init__(self):
         self._max_x = 540 # width
         self._max_y = 800 # Heigth
@@ -265,4 +265,4 @@ class GraphiBubbleSort:
         except:
             return False
 
-sw = GraphiBubbleSort()
+sw = GraphicSortAGL()
