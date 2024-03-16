@@ -38,7 +38,7 @@ class GraphiBubbleSort:
         self.thread.start()
         self.initArrNumbers()
         self.dx_item_number_x = self._max_x / len(self.arrNumbers) # to graficate numbers in axis x
-        self._maxValueInArrNumbers = max(self.arrNumbers)
+        self._maxValueInArrNumbers = max(self.arrNumbers) * 1.05
         self._pivot0 = 0 # paint Travel into array arr[j]
         self._pivot1 = 0 # paint Travel into array arr[j+1]
         self._temp = None # To swap
@@ -78,7 +78,7 @@ class GraphiBubbleSort:
         if not self.isRunALG:
             self.arrNumbers.clear()
             for i in range(40):
-                self.arrNumbers.append(randint(1, 999))
+                self.arrNumbers.append(randint(8, 999))
 
     def update_graphic(self):
         if self.isRunALG:
@@ -92,18 +92,33 @@ class GraphiBubbleSort:
         for i in range(0, len(self.arrNumbers)):
             x0 = self.dx_item_number_x * i
             x1 = x0 + self.dx_item_number_x
-            y0 = 0
-            y1 = (self.arrNumbers[i]/self._maxValueInArrNumbers) * self._max_y 
+            y0 = self._max_y
+            dy = self.arrNumbers[i]/self._maxValueInArrNumbers
+            y1 = self._max_y * dy
 
             if i == self._pivot0 or i == self._pivot1:    
+
+                self.canvasGraphics.create_rectangle(
+                    x0,
+                    y0,
+                    x1,
+                    y1,
+                    fill="red",
+                    tags="arr"
+                )
+
+
                 self.canvasGraphics.create_rectangle(
                     x0,
                     y1,
                     x1,
-                    y0,
-                    fill="red",
+                    0,
+                    fill="yellow",
                     tags="arr"
                 )
+
+
+
             else:
                 self.canvasGraphics.create_rectangle(
                     x0,
@@ -130,6 +145,8 @@ class GraphiBubbleSort:
         self._pivot1 = 0
         self.iterator = 0
         self.lblALG['text'] = "ALG"
+        self.showArrayNumbers()
+        
 
 
     def run2(self):
