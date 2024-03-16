@@ -23,10 +23,12 @@ class GraphiBubbleSort:
         self.canvasGraphics = Canvas(self.screem, width=self._max_x, height=self._max_y*0.8, bg="black")
         self.lblNumbersQTY = Label(self.canvasController, text="Insert number QTY: ")
         self.txtNumbersQTY = Entry(self.canvasController, width=6)
+        self.lblTimeSleep = Label(self.canvasController, text="Velocity = 100%")
+        self.sliderTimeSleep = Scale(self.canvasController, from_=0, to=100, orient="horizontal", command=self.modifyTimeSleep)
+        self.sliderTimeSleep.set(50)
         self.btnPlay = Button(self.canvasController, text="PLAY", command=self.play)
         self.btnPause = Button(self.canvasController, text="PAUSE", command=self.pause)
         self.btnReStart = Button(self.canvasController, text="RE-START", command=self.restart)
-        self.lblIteration = Label(self.canvasController, text="Iteracion: 0")
         self.lblALG = Label(self.canvasController, text="ALG")
 
         """Vars"""
@@ -61,11 +63,12 @@ class GraphiBubbleSort:
         self.canvasController.create_line(self._max_x*0.38, 0, self._max_x*0.38, self._max_y*0.2)
         self.lblNumbersQTY.place(x=10, y=10)
         self.txtNumbersQTY.place(x=120, y=12)
+        self.lblTimeSleep.place(x=10, y=40)
+        self.sliderTimeSleep.place(x=10, y=60)
         self.lblALG.place(x=self._max_x*0.55, y=20)
         self.btnPlay.place(x=10, y=self._max_y*0.15)
         self.btnPause.place(x=60, y=self._max_y*0.15)
         self.btnReStart.place(x=110, y=self._max_y*0.15)
-        self.lblIteration.place(x=10, y=50)
         self.canvasGraphics.place(x=0, y=self._max_y*0.2)
         self.showArrayNumbers()
         self.screem.after(0, self.update_graphic)
@@ -93,6 +96,11 @@ class GraphiBubbleSort:
         self._pivot1 = 0
         self._temp = None
 
+    def modifyTimeSleep(self, value):
+        k = int(value)
+        self._sleepTime = 0.02 * (k/100)
+
+
     def initArrNumbersDefault(self):
         if not self.isRunALG:
             self.arrNumbers.clear()
@@ -109,7 +117,6 @@ class GraphiBubbleSort:
         if self.isRunALG:
             self.showArrayNumbers()
             self.showALG()
-            self.lblIteration["text"] = "Iteracion: " + str(self.iterator)
         self.screem.after(30, self.update_graphic)
 
     def showArrayNumbers(self):
