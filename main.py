@@ -21,6 +21,8 @@ class GraphiBubbleSort:
         self.screem = Tk()
         self.canvasController = Canvas(self.screem, width=self._max_x, height=self._max_y/5, bg="snow")
         self.canvasGraphics = Canvas(self.screem, width=self._max_x, height=self._max_y*0.8, bg="black")
+        self.lblNumbersQTY = Label(self.canvasController, text="Insert number QTY: ")
+        self.txtNumbersQTY = Entry(self.canvasController, width=6)
         self.btnPlay = Button(self.canvasController, text="PLAY", command=self.play)
         self.btnPause = Button(self.canvasController, text="PAUSE", command=self.pause)
         self.btnReStart = Button(self.canvasController, text="RE-START", command=self.restart)
@@ -30,18 +32,24 @@ class GraphiBubbleSort:
         """Vars"""
         self.iterator = 0
         self._swapsCounter = 0
+        self._counter_btn_play_presed = 0
+        self.counter_resolver_alg = 0
         self.arrNumbers = []  # Save numbers 640
         self.isRunALG = False  # program  running?
 
         self.thread = Thread(target=self.run)
         """Preparate launch"""
         self.thread.start()
-        self.initArrNumbers()
-        self.dx_item_number_x = self._max_x / len(self.arrNumbers) # to graficate numbers in axis x
+        self.initArrNumbersDefault()
+        self.lenArrNumbers = len(self.arrNumbers)
+        self._iCounter = 0
+        self._jCounter = 0
+        self.dx_item_number_x = self._max_x / self.lenArrNumbers # to graficate numbers in axis x
         self._maxValueInArrNumbers = max(self.arrNumbers) * 1.05
         self._pivot0 = 0 # paint Travel into array arr[j]
         self._pivot1 = 0 # paint Travel into array arr[j+1]
         self._temp = None # To swap
+
         """Se muestra todo"""
         self.showAndConfigureDisplay()
 
@@ -51,6 +59,8 @@ class GraphiBubbleSort:
         self.screem.geometry(f"{self._max_x}x{self._max_y}")
         self.canvasController.place(x=0, y=0)
         self.canvasController.create_line(self._max_x*0.38, 0, self._max_x*0.38, self._max_y*0.2)
+        self.lblNumbersQTY.place(x=10, y=10)
+        self.txtNumbersQTY.place(x=120, y=12)
         self.lblALG.place(x=self._max_x*0.55, y=20)
         self.btnPlay.place(x=10, y=self._max_y*0.15)
         self.btnPause.place(x=60, y=self._max_y*0.15)
@@ -66,18 +76,33 @@ class GraphiBubbleSort:
     def showALG(self):
         # Not optimal bubble sort
         if True:
-            txt = f"Total numbers: {len(self.arrNumbers)}\n"
-            txt = txt + f"Iterations: {self.iterator} of {len(self.arrNumbers)**2}\n"
+            txt = f"Total numbers: {self.lenArrNumbers}\n"
+            txt = txt + f"Iterations: {self.iterator} of {self.lenArrNumbers**2}\n"
             txt = txt + f"Swaps: {self._swapsCounter}\n"
             txt = txt + f"Comparate: {self.arrNumbers[self._pivot0]}:{self.arrNumbers[self._pivot1]}\n"
         
         
         self.lblALG['text'] = txt
 
-    def initArrNumbers(self):
+
+    def calculateKons(self):
+        self.lenArrNumbers = len(self.arrNumbers)
+        self.dx_item_number_x = self._max_x / self.lenArrNumbers 
+        self._maxValueInArrNumbers = max(self.arrNumbers) * 1.05
+        self._pivot0 = 0 
+        self._pivot1 = 0
+        self._temp = None
+
+    def initArrNumbersDefault(self):
         if not self.isRunALG:
             self.arrNumbers.clear()
-            for i in range(40):
+            for i in range(100):
+                self.arrNumbers.append(randint(8, 999))
+
+    def initArrNumbers(self, qty):
+        if not self.isRunALG:
+            self.arrNumbers.clear()
+            for i in range(qty):
                 self.arrNumbers.append(randint(8, 999))
 
     def update_graphic(self):
@@ -89,15 +114,14 @@ class GraphiBubbleSort:
 
     def showArrayNumbers(self):
         self.canvasGraphics.delete("arr")
-        for i in range(0, len(self.arrNumbers)):
+        for i in range(0, self.lenArrNumbers):
             x0 = self.dx_item_number_x * i
             x1 = x0 + self.dx_item_number_x
             y0 = self._max_y
             dy = self.arrNumbers[i]/self._maxValueInArrNumbers
             y1 = self._max_y * dy
 
-            if i == self._pivot0 or i == self._pivot1:    
-
+            if i == self._pivot0 or i == self._pivot1 and self.isRunALG:    
                 self.canvasGraphics.create_rectangle(
                     x0,
                     y0,
@@ -106,8 +130,6 @@ class GraphiBubbleSort:
                     fill="red",
                     tags="arr"
                 )
-
-
                 self.canvasGraphics.create_rectangle(
                     x0,
                     y1,
@@ -116,9 +138,6 @@ class GraphiBubbleSort:
                     fill="yellow",
                     tags="arr"
                 )
-
-
-
             else:
                 self.canvasGraphics.create_rectangle(
                     x0,
@@ -130,9 +149,36 @@ class GraphiBubbleSort:
                 )
 
 
+            if self.iterator >= (self.lenArrNumbers**2)-self.lenArrNumbers:
+                print("Epaaa")
+
+
     def play(self):
-        self.screem.title("Burbuja by loko:PLAY")
-        self.isRunALG = True
+        self.isRunALG = False
+
+
+        if self._counter_btn_play_presed == 0:
+            self.isRunALG = True
+            if not self.isValidQtyOfNumbers():
+                self.screem.title("Bubble Sort Error in input NQty")
+            else:
+                self.screem.title(f"Bubble Sort Default")
+        else:
+            if self.isValidQtyOfNumbers() and self._counter_btn_play_presed != 0:
+                self.initArrNumbers(int(self.txtNumbersQTY.get()))
+                self.calculateKons()
+                self.cleanTxt()
+                self.isRunALG = True
+                self.screem.title("Bubble Sort By FelipedelosH")
+            else:
+                self.screem.title("Bubble Sort Error in input NQty")
+                self.isRunALG = False
+
+            if self.counter_resolver_alg == 0:
+                self.isRunALG = True
+        
+        self._counter_btn_play_presed = self._counter_btn_play_presed + 1
+        
 
     def pause(self):
         self.screem.title("Burbuja by loko:PAUSE")
@@ -140,7 +186,11 @@ class GraphiBubbleSort:
 
     def restart(self):
         self.isRunALG = False
-        self.initArrNumbers()
+        self._iCounter = 0
+        self._jCounter = 0
+        k = randint(33, 99)
+        self.initArrNumbers(k)
+        self.calculateKons()
         self._pivot0 = 0
         self._pivot1 = 0
         self.iterator = 0
@@ -150,47 +200,62 @@ class GraphiBubbleSort:
 
 
     def run2(self):
-        iCounter = 0
-        jCounter = 0
-        aux = 0
         self.iterator = 0 # Count total program times need to sort
         while True:
-            while self.isRunALG and iCounter < len(self.arrNumbers):
-                jCounter = 0
-                while self.isRunALG and jCounter < len(self.arrNumbers) - (iCounter + 1):
-                    self._pivot0 = jCounter
-                    self._pivot1 = jCounter+1
-                    if (self.arrNumbers[jCounter] < self.arrNumbers[jCounter + 1]):
-                        aux = self.arrNumbers[jCounter + 1]
-                        self.arrNumbers[jCounter + 1] = self.arrNumbers[jCounter]
-                        self.arrNumbers[jCounter] = aux
+            try:
+                while self.isRunALG and self._iCounter < self.lenArrNumbers:
+                    self._jCounter = 0
+                    while self.isRunALG and self._jCounter < len(self.arrNumbers) - (self._iCounter + 1):
+                        self._pivot0 = self._jCounter
+                        self._pivot1 = self._jCounter + 1
+                        if (self.arrNumbers[self._jCounter] < self.arrNumbers[self._jCounter + 1]):
+                            aux = self.arrNumbers[self._jCounter + 1]
+                            self.arrNumbers[self._jCounter + 1] = self.arrNumbers[self._jCounter]
+                            self.arrNumbers[self._jCounter] = aux
 
-                    self.iterator += 1
-                    jCounter = jCounter + 1
+                        self.iterator += 1
+                        self._jCounter = self._jCounter + 1
 
-                sleep(self._sleepTime)
-                """Se incrementa i"""
-                if self.isRunALG:
-                    iCounter = iCounter + 1
+                    sleep(self._sleepTime)
+
+                    if self.isRunALG:
+                        self._iCounter = self._iCounter + 1
+            except:
+                sleep(0.3)
+
 
    
     def run(self):
         self.iterator = 0
         while True:
-            while self.isRunALG:
-                for _ in range(0, len(self.arrNumbers)):
-                    for j in range(0, len(self.arrNumbers)-1):     
-                        self._pivot0 = j
-                        self._pivot1 = j+1
-                        if self.arrNumbers[j] < self.arrNumbers[j+1]:
-                            self._temp = self.arrNumbers[j]
-                            self.arrNumbers[j] = self.arrNumbers[j+1]
-                            self.arrNumbers[j+1] = self._temp
-                            self._swapsCounter = self._swapsCounter + 1
-                        sleep(self._sleepTime)
-                        self.iterator = self.iterator + 1
+            try:
+                while self.isRunALG:
+                    for _ in range(0, len(self.arrNumbers)):
+                        for j in range(0, len(self.arrNumbers)-1):     
+                            self._pivot0 = j
+                            self._pivot1 = j+1
+                            if self.arrNumbers[j] < self.arrNumbers[j+1]:
+                                self._temp = self.arrNumbers[j]
+                                self.arrNumbers[j] = self.arrNumbers[j+1]
+                                self.arrNumbers[j+1] = self._temp
+                                self._swapsCounter = self._swapsCounter + 1
+                            sleep(self._sleepTime)
+                            self.iterator = self.iterator + 1
 
-                self.isRunALG = False
+                    self.counter_resolver_alg = self.counter_resolver_alg + 1
+                    self.isRunALG = False
+            except:
+                sleep(0.3)
 
+
+    def cleanTxt(self):
+        self.txtNumbersQTY.set("")
+
+
+    def isValidQtyOfNumbers(self):
+        try:
+            return int(self.txtNumbersQTY.get()) > 0
+        except:
+            return False
 
 sw = GraphiBubbleSort()
