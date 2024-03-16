@@ -97,9 +97,9 @@ class GraphicSortAGL:
         self._temp = None
 
     def modifyTimeSleep(self, value):
+        self.lblTimeSleep['text'] = f"Velocity = {value}%"
         k = int(value)
-        self._sleepTime =  0.02 + 0.2 * (k/100)
-
+        self._sleepTime = 0.01 + (0.1 * (1-(k/100)))
 
     def initArrNumbersDefault(self):
         if not self.isRunALG:
@@ -114,10 +114,14 @@ class GraphicSortAGL:
                 self.arrNumbers.append(randint(8, 999))
 
     def update_graphic(self):
-        if self.isRunALG:
-            self.showArrayNumbers()
-            self.showALG()
-        self.screem.after(30, self.update_graphic)
+        try:
+            if self.isRunALG:
+                self.showArrayNumbers()
+                self.showALG()
+            self.screem.after(30, self.update_graphic)
+        except:
+            self.restart()
+
 
     def showArrayNumbers(self):
         self.canvasGraphics.delete("arr")
@@ -191,7 +195,7 @@ class GraphicSortAGL:
         self.screem.title("Burbuja by loko:PAUSE")
         self.isRunALG = False
 
-    def restart(self):
+    def restartDefault(self):
         self.isRunALG = False
         self._iCounter = 0
         self._jCounter = 0
@@ -204,7 +208,20 @@ class GraphicSortAGL:
         self.lblALG['text'] = "ALG"
         self.showArrayNumbers()
         
+    def restart(self):
+        self.isRunALG = False
+        self._iCounter = 0
+        self._jCounter = 0
+        self._pivot0 = 0
+        self._pivot1 = 0
+        self.iterator = 0
+        k = len(self.arrNumbers)
+        self.initArrNumbers(k)
+        self.calculateKons()
 
+        self.lblALG['text'] = "ALG"
+        self.showArrayNumbers()
+        
 
     def run2(self):
         self.iterator = 0 # Count total program times need to sort
@@ -256,7 +273,7 @@ class GraphicSortAGL:
 
 
     def cleanTxt(self):
-        self.txtNumbersQTY.set("")
+        self.txtNumbersQTY.delete(0, END)
 
 
     def isValidQtyOfNumbers(self):
