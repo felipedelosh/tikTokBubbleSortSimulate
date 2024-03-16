@@ -98,7 +98,7 @@ class GraphiBubbleSort:
 
     def modifyTimeSleep(self, value):
         k = int(value)
-        self._sleepTime = 0.02 * (k/100)
+        self._sleepTime =  0.02 + 0.2 * (k/100)
 
 
     def initArrNumbersDefault(self):
