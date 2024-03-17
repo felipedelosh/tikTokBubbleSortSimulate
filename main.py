@@ -8,6 +8,7 @@ Open a mobile interface and manipulate bubbleSort ALG
 """
 
 from tkinter import *
+from tkinter import ttk
 from random import randint
 from threading import *
 from time import sleep
@@ -21,6 +22,11 @@ class GraphicSortAGL:
         self.screem = Tk()
         self.canvasController = Canvas(self.screem, width=self._max_x, height=self._max_y/5, bg="snow")
         self.canvasGraphics = Canvas(self.screem, width=self._max_x, height=self._max_y*0.8, bg="black")
+        self.txt_alg_cbx_selection = StringVar(value='Brute Bubble Sort')
+        self.alg_registred = ['Brute Bubble Sort', 'Optimal Bubble Sort']
+        self.cbx_selected_alg = ttk.Combobox(self.canvasController, textvariable=self.txt_alg_cbx_selection, state='readonly')
+        self.cbx_selected_alg['values'] = self.alg_registred
+        self.cbx_selected_alg.bind('<<ComboboxSelected>>', self.cbx_changed)
         self.lblNumbersQTY = Label(self.canvasController, text="Insert number QTY: ")
         self.txtNumbersQTY = Entry(self.canvasController, width=6)
         self.lblTimeSleep = Label(self.canvasController, text="Velocity = 100%")
@@ -61,11 +67,12 @@ class GraphicSortAGL:
         self.screem.geometry(f"{self._max_x}x{self._max_y}")
         self.canvasController.place(x=0, y=0)
         self.canvasController.create_line(self._max_x*0.38, 0, self._max_x*0.38, self._max_y*0.2)
+        self.cbx_selected_alg.place(x=220, y=12)
         self.lblNumbersQTY.place(x=10, y=10)
         self.txtNumbersQTY.place(x=120, y=12)
         self.lblTimeSleep.place(x=10, y=40)
         self.sliderTimeSleep.place(x=10, y=60)
-        self.lblALG.place(x=self._max_x*0.55, y=20)
+        self.lblALG.place(x=self._max_x*0.55, y=60)
         self.btnPlay.place(x=10, y=self._max_y*0.15)
         self.btnPause.place(x=60, y=self._max_y*0.15)
         self.btnReStart.place(x=110, y=self._max_y*0.15)
@@ -163,6 +170,8 @@ class GraphicSortAGL:
             if self.iterator >= (self.lenArrNumbers**2)-self.lenArrNumbers:
                 print("Epaaa")
 
+    def cbx_changed(self, event):
+        self.restart()
 
     def play(self):
         self.isRunALG = False
@@ -253,21 +262,45 @@ class GraphicSortAGL:
         self.iterator = 0
         while True:
             try:
-                while self.isRunALG:
-                    for _ in range(0, len(self.arrNumbers)):
-                        for j in range(0, len(self.arrNumbers)-1):     
-                            self._pivot0 = j
-                            self._pivot1 = j+1
-                            if self.arrNumbers[j] < self.arrNumbers[j+1]:
-                                self._temp = self.arrNumbers[j]
-                                self.arrNumbers[j] = self.arrNumbers[j+1]
-                                self.arrNumbers[j+1] = self._temp
-                                self._swapsCounter = self._swapsCounter + 1
-                            sleep(self._sleepTime)
-                            self.iterator = self.iterator + 1
+                # Brute bubble sort
+                if self.cbx_selected_alg.get() == self.alg_registred[0]:
+                    while self.isRunALG:
+                        for _ in range(0, len(self.arrNumbers)):
+                            for j in range(0, len(self.arrNumbers)-1):     
+                                self._pivot0 = j
+                                self._pivot1 = j+1
+                                if self.arrNumbers[j] < self.arrNumbers[j+1]:
+                                    self._temp = self.arrNumbers[j]
+                                    self.arrNumbers[j] = self.arrNumbers[j+1]
+                                    self.arrNumbers[j+1] = self._temp
+                                    self._swapsCounter = self._swapsCounter + 1
+                                sleep(self._sleepTime)
+                                self.iterator = self.iterator + 1
 
-                    self.counter_resolver_alg = self.counter_resolver_alg + 1
-                    self.isRunALG = False
+                        self.counter_resolver_alg = self.counter_resolver_alg + 1
+                        self.isRunALG = False
+
+
+                # optimal bubble sort
+                if self.cbx_selected_alg.get() == self.alg_registred[1]:
+                    while self.isRunALG:
+                        limit = self.lenArrNumbers
+                        for _ in range(0, self.lenArrNumbers):
+                            for j in range(0, limit-1):     
+                                self._pivot0 = j
+                                self._pivot1 = j+1
+                                if self.arrNumbers[j] < self.arrNumbers[j+1]:
+                                    self._temp = self.arrNumbers[j]
+                                    self.arrNumbers[j] = self.arrNumbers[j+1]
+                                    self.arrNumbers[j+1] = self._temp
+                                    self._swapsCounter = self._swapsCounter + 1
+                                sleep(self._sleepTime)
+                                self.iterator = self.iterator + 1
+                            limit = limit - 1
+
+                        self.counter_resolver_alg = self.counter_resolver_alg + 1
+                        self.isRunALG = False
+
             except:
                 sleep(0.3)
 
