@@ -11,6 +11,7 @@ I try to see with my eyes how to do sort algorithms
 ## :hammer:Funtions:
 
 - `Brute Bubble Sort`: Try to order arr with bubble sort not optimal<br>
+- `Optima Bubble Sort`: Try to order arr with bubble sort optimal<br>
 
 
 
