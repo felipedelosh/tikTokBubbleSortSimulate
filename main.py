@@ -50,10 +50,12 @@ class GraphicSortAGL:
         self.thread.start()
         self.initArrNumbersDefault()
         self.lenArrNumbers = len(self.arrNumbers)
+        self.calculateMaxIterators()
         self._iCounter = 0
         self._jCounter = 0
         self.dx_item_number_x = self._max_x / self.lenArrNumbers # to graficate numbers in axis x
         self._maxValueInArrNumbers = max(self.arrNumbers) * 1.05
+        self.var_calc_max_iterators = 0
         self._pivot0 = 0 # paint Travel into array arr[j]
         self._pivot1 = 0 # paint Travel into array arr[j+1]
         self._temp = None # To swap
@@ -84,15 +86,22 @@ class GraphicSortAGL:
         self.screem.mainloop()
 
     def showALG(self):
-        # Not optimal bubble sort
-        if True:
-            txt = f"Total numbers: {self.lenArrNumbers}\n"
-            txt = txt + f"Iterations: {self.iterator} of {self.lenArrNumbers**2}\n"
-            txt = txt + f"Swaps: {self._swapsCounter}\n"
-            txt = txt + f"Comparate: {self.arrNumbers[self._pivot0]}:{self.arrNumbers[self._pivot1]}\n"
-        
-        
-        self.lblALG['text'] = txt
+        if self.isRunALG:
+            # Not optimal bubble sort
+            if str(self.txt_alg_cbx_selection.get()) == self.alg_registred[0]:
+                txt = f"Total numbers: {self.lenArrNumbers}\n"
+                txt = txt + f"Iterations: {self.iterator} of {self.var_calc_max_iterators}\n"
+                txt = txt + f"Swaps: {self._swapsCounter}\n"
+                txt = txt + f"Comparate: {self.arrNumbers[self._pivot0]}:{self.arrNumbers[self._pivot1]}\n"
+                self.lblALG['text'] = txt
+
+
+            if str(self.txt_alg_cbx_selection.get()) == self.alg_registred[1]:
+                txt = f"Total numbers: {self.lenArrNumbers}\n"
+                txt = txt + f"Iterations: {self.iterator} of {self.var_calc_max_iterators}\n"
+                txt = txt + f"Swaps: {self._swapsCounter}\n"
+                txt = txt + f"Comparate: {self.arrNumbers[self._pivot0]}:{self.arrNumbers[self._pivot1]}\n"
+                self.lblALG['text'] = txt
 
 
     def calculateKons(self):
@@ -102,6 +111,7 @@ class GraphicSortAGL:
         self._pivot0 = 0 
         self._pivot1 = 0
         self._temp = None
+        self.calculateMaxIterators()
 
     def modifyTimeSleep(self, value):
         self.lblTimeSleep['text'] = f"Velocity = {value}%"
@@ -115,7 +125,19 @@ class GraphicSortAGL:
         mixArrNumbers = self.arrNumbers.copy()
         random.shuffle(mixArrNumbers)
         self.arrNumbers = mixArrNumbers
-            
+
+    def calculateMaxIterators(self):
+        # Brute bubble sort
+        self.var_calc_max_iterators = 11
+        pass
+        # if str(self.txt_alg_cbx_selection.get()) == self.alg_registred[0]:
+        #     self.var_calc_max_iterators = self.lenArrNumbers ** 2
+        #     print(self.var_calc_max_iterators)
+
+        # # optimal bubble sort
+        # if str(self.txt_alg_cbx_selection.get()) == self.alg_registred[1]:
+        #     _sum = 0
+        #     self.var_calc_max_iterators = _sum
 
     def initArrNumbers(self, qty):
         self.arrNumbers.clear()
@@ -237,86 +259,59 @@ class GraphicSortAGL:
         self.showArrayNumbers()
         
 
-    def run2(self):
+    def run(self):
         self.iterator = 0 # Count total program times need to sort
         while True:
             try:
-                while self.isRunALG and self._iCounter < self.lenArrNumbers:
-                    self._jCounter = 0
-                    while self.isRunALG and self._jCounter < len(self.arrNumbers) - (self._iCounter + 1):
-                        self._pivot0 = self._jCounter
-                        self._pivot1 = self._jCounter + 1
-                        if (self.arrNumbers[self._jCounter] < self.arrNumbers[self._jCounter + 1]):
-                            aux = self.arrNumbers[self._jCounter + 1]
-                            self.arrNumbers[self._jCounter + 1] = self.arrNumbers[self._jCounter]
-                            self.arrNumbers[self._jCounter] = aux
+                # Brute Bubble Sort
+                isBruteBubbleSort = str(self.txt_alg_cbx_selection.get()) == self.alg_registred[0]
+                if isBruteBubbleSort:
+                    _arrCounter = 0
+                    while _arrCounter < self.lenArrNumbers and self.isRunALG:
+                        _itemCounter = 0
+                        while _itemCounter < self.lenArrNumbers-1 and self.isRunALG:
+                            self._pivot0 = _itemCounter
+                            self._pivot1 = _itemCounter + 1
+                            if self.arrNumbers[self._pivot0] < self.arrNumbers[self._pivot1]:
+                                self._temp = self.arrNumbers[self._pivot0]
+                                self.arrNumbers[self._pivot0] = self.arrNumbers[self._pivot1]
+                                self.arrNumbers[self._pivot1] = self._temp
+                                self._swapsCounter = self._swapsCounter + 1
 
-                        self.iterator += 1
-                        self._jCounter = self._jCounter + 1
-
-                    sleep(self._sleepTime)
-
-                    if self.isRunALG:
-                        self._iCounter = self._iCounter + 1
-            except:
-                sleep(0.3)
-
-
-   
-    def run(self):
-        self.iterator = 0
-        while True:
-            try:
-                # Brute bubble sort
-                if self.cbx_selected_alg.get() == self.alg_registred[0]:
-                    if self.isRunALG:
-                        for _ in range(0, len(self.arrNumbers)):
-                            for j in range(0, len(self.arrNumbers)-1):
-                                if self.isRunALG:     
-                                    self._pivot0 = j
-                                    self._pivot1 = j+1
-                                else:
-                                    break
-
-                                if self.arrNumbers[j] < self.arrNumbers[j+1]:
-                                    self._temp = self.arrNumbers[j]
-                                    self.arrNumbers[j] = self.arrNumbers[j+1]
-                                    self.arrNumbers[j+1] = self._temp
-                                    self._swapsCounter = self._swapsCounter + 1
-                                sleep(self._sleepTime)
-                                self.iterator = self.iterator + 1
+                            sleep(self._sleepTime)
+                            self.iterator = self.iterator + 1
+                            _itemCounter = _itemCounter + 1
 
 
-                    self.counter_resolver_alg = self.counter_resolver_alg + 1
+                        _arrCounter = _arrCounter + 1
                     self.isRunALG = False
 
-                # optimal bubble sort
-                if self.cbx_selected_alg.get() == self.alg_registred[1]:
-                    if self.isRunALG:
-                        limit = self.lenArrNumbers
-                        for _ in range(0, self.lenArrNumbers):
-                            for j in range(0, limit-1):
-                                if self.isRunALG:     
-                                    self._pivot0 = j
-                                    self._pivot1 = j+1
 
-                                self._pivot0 = j
-                                self._pivot1 = j+1
-                                if self.arrNumbers[j] < self.arrNumbers[j+1]:
-                                    self._temp = self.arrNumbers[j]
-                                    self.arrNumbers[j] = self.arrNumbers[j+1]
-                                    self.arrNumbers[j+1] = self._temp
-                                    self._swapsCounter = self._swapsCounter + 1
-                                sleep(self._sleepTime)
-                                self.iterator = self.iterator + 1
-                            limit = limit - 1
+                isOptimalBubbleSort = str(self.txt_alg_cbx_selection.get()) == self.alg_registred[1]
+                if isOptimalBubbleSort and self.isRunALG:
+                    _arrCounter = 0
+                    while _arrCounter < self.lenArrNumbers:
+                        _itemCounter = 0
+                        while _itemCounter < self.lenArrNumbers - (_arrCounter + 1):
+                            self._pivot0 = _itemCounter
+                            self._pivot1 = _itemCounter + 1
+                            if self.arrNumbers[self._pivot0] < self.arrNumbers[self._pivot1]:
+                                self._temp = self.arrNumbers[self._pivot0]
+                                self.arrNumbers[self._pivot0] = self.arrNumbers[self._pivot1]
+                                self.arrNumbers[self._pivot1] = self._temp
+                                self._swapsCounter = self._swapsCounter + 1
 
-                        self.counter_resolver_alg = self.counter_resolver_alg + 1
-                        self.isRunALG = False
+                            sleep(self._sleepTime)
+                            self.iterator = self.iterator + 1
+                            _itemCounter = _itemCounter + 1
+
+                        _arrCounter = _arrCounter + 1
 
 
+                sleep(0.0001)
             except:
                 sleep(0.3)
+
 
 
     def cleanTxt(self):
