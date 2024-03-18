@@ -9,7 +9,7 @@ Open a mobile interface and manipulate bubbleSort ALG
 
 from tkinter import *
 from tkinter import ttk
-from random import randint
+import random
 from threading import *
 from time import sleep
 
@@ -109,16 +109,21 @@ class GraphicSortAGL:
         self._sleepTime = 0.01 + (0.1 * (1-(k/100)))
 
     def initArrNumbersDefault(self):
-        if not self.isRunALG:
-            self.arrNumbers.clear()
-            for i in range(100):
-                self.arrNumbers.append(randint(8, 999))
+        self.arrNumbers.clear()
+        for i in range(100):
+            self.arrNumbers.append(i)
+        mixArrNumbers = self.arrNumbers.copy()
+        random.shuffle(mixArrNumbers)
+        self.arrNumbers = mixArrNumbers
+            
 
     def initArrNumbers(self, qty):
-        if not self.isRunALG:
-            self.arrNumbers.clear()
-            for i in range(qty):
-                self.arrNumbers.append(randint(8, 999))
+        self.arrNumbers.clear()
+        for i in range(qty):
+            self.arrNumbers.append(i)
+        mixArrNumbers = self.arrNumbers.copy()
+        random.shuffle(mixArrNumbers)
+        self.arrNumbers = mixArrNumbers
 
     def update_graphic(self):
         try:
@@ -208,7 +213,7 @@ class GraphicSortAGL:
         self.isRunALG = False
         self._iCounter = 0
         self._jCounter = 0
-        k = randint(33, 99)
+        k = random.randint(33, 99)
         self.initArrNumbers(k)
         self.calculateKons()
         self._pivot0 = 0
@@ -264,11 +269,15 @@ class GraphicSortAGL:
             try:
                 # Brute bubble sort
                 if self.cbx_selected_alg.get() == self.alg_registred[0]:
-                    while self.isRunALG:
+                    if self.isRunALG:
                         for _ in range(0, len(self.arrNumbers)):
-                            for j in range(0, len(self.arrNumbers)-1):     
-                                self._pivot0 = j
-                                self._pivot1 = j+1
+                            for j in range(0, len(self.arrNumbers)-1):
+                                if self.isRunALG:     
+                                    self._pivot0 = j
+                                    self._pivot1 = j+1
+                                else:
+                                    break
+
                                 if self.arrNumbers[j] < self.arrNumbers[j+1]:
                                     self._temp = self.arrNumbers[j]
                                     self.arrNumbers[j] = self.arrNumbers[j+1]
@@ -277,16 +286,20 @@ class GraphicSortAGL:
                                 sleep(self._sleepTime)
                                 self.iterator = self.iterator + 1
 
-                        self.counter_resolver_alg = self.counter_resolver_alg + 1
-                        self.isRunALG = False
 
+                    self.counter_resolver_alg = self.counter_resolver_alg + 1
+                    self.isRunALG = False
 
                 # optimal bubble sort
                 if self.cbx_selected_alg.get() == self.alg_registred[1]:
-                    while self.isRunALG:
+                    if self.isRunALG:
                         limit = self.lenArrNumbers
                         for _ in range(0, self.lenArrNumbers):
-                            for j in range(0, limit-1):     
+                            for j in range(0, limit-1):
+                                if self.isRunALG:     
+                                    self._pivot0 = j
+                                    self._pivot1 = j+1
+
                                 self._pivot0 = j
                                 self._pivot1 = j+1
                                 if self.arrNumbers[j] < self.arrNumbers[j+1]:
@@ -300,6 +313,7 @@ class GraphicSortAGL:
 
                         self.counter_resolver_alg = self.counter_resolver_alg + 1
                         self.isRunALG = False
+
 
             except:
                 sleep(0.3)
