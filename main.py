@@ -165,8 +165,9 @@ class GraphicSortAGL:
             y0 = self._max_y
             dy = self.arrNumbers[i]/self._maxValueInArrNumbers
             y1 = self._max_y * dy
-
-            if i == self._pivot0 or i == self._pivot1 and self.isRunALG:    
+            
+            print(self._counter_btn_play_presed)
+            if (i == self._pivot0 or i == self._pivot1) and self.isRunALG and self._counter_btn_play_presed != 0:    
                 self.canvasGraphics.create_rectangle(
                     x0,
                     y0,
@@ -193,9 +194,6 @@ class GraphicSortAGL:
                     tags="arr"
                 )
 
-
-            if self.iterator >= (self.lenArrNumbers**2)-self.lenArrNumbers:
-                print("Epaaa")
 
     def cbx_changed(self, event):
         self.restart()
