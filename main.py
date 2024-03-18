@@ -43,14 +43,14 @@ class GraphicSortAGL:
         self._counter_btn_play_presed = 0
         self.counter_resolver_alg = 0
         self.arrNumbers = []  # Save numbers 640
-        self.isRunALG = False  # program  running?
+        self._pressed_play = False  # program  running?
+        self._pressed_pause = False
 
         self.thread = Thread(target=self.run)
         """Preparate launch"""
         self.thread.start()
         self.initArrNumbersDefault()
         self.lenArrNumbers = len(self.arrNumbers)
-        self.calculateMaxIterators()
         self._iCounter = 0
         self._jCounter = 0
         self.dx_item_number_x = self._max_x / self.lenArrNumbers # to graficate numbers in axis x
@@ -86,7 +86,7 @@ class GraphicSortAGL:
         self.screem.mainloop()
 
     def showALG(self):
-        if self.isRunALG:
+        if self._pressed_play:
             # Not optimal bubble sort
             if str(self.txt_alg_cbx_selection.get()) == self.alg_registred[0]:
                 txt = f"Total numbers: {self.lenArrNumbers}\n"
@@ -128,16 +128,20 @@ class GraphicSortAGL:
 
     def calculateMaxIterators(self):
         # Brute bubble sort
-        self.var_calc_max_iterators = 11
-        pass
-        # if str(self.txt_alg_cbx_selection.get()) == self.alg_registred[0]:
-        #     self.var_calc_max_iterators = self.lenArrNumbers ** 2
-        #     print(self.var_calc_max_iterators)
+        if str(self.txt_alg_cbx_selection.get()) == self.alg_registred[0]:
+            _sum = 0
+            for i in range(self.lenArrNumbers):
+                _sum = _sum + self.lenArrNumbers - 1
+            self.var_calc_max_iterators = _sum
 
-        # # optimal bubble sort
-        # if str(self.txt_alg_cbx_selection.get()) == self.alg_registred[1]:
-        #     _sum = 0
-        #     self.var_calc_max_iterators = _sum
+        # Optimal
+        if str(self.txt_alg_cbx_selection.get()) == self.alg_registred[1]:
+            _sum = 0
+            for i in range(self.lenArrNumbers):
+                _sum = _sum + i
+            self.var_calc_max_iterators = _sum
+
+        
 
     def initArrNumbers(self, qty):
         self.arrNumbers.clear()
@@ -149,7 +153,7 @@ class GraphicSortAGL:
 
     def update_graphic(self):
         try:
-            if self.isRunALG:
+            if self._pressed_play:
                 self.showArrayNumbers()
                 self.showALG()
             self.screem.after(30, self.update_graphic)
@@ -166,8 +170,7 @@ class GraphicSortAGL:
             dy = self.arrNumbers[i]/self._maxValueInArrNumbers
             y1 = self._max_y * dy
             
-            print(self._counter_btn_play_presed)
-            if (i == self._pivot0 or i == self._pivot1) and self.isRunALG and self._counter_btn_play_presed != 0:    
+            if (i == self._pivot0 or i == self._pivot1) and self._pressed_play and self._counter_btn_play_presed != 0:    
                 self.canvasGraphics.create_rectangle(
                     x0,
                     y0,
@@ -196,41 +199,48 @@ class GraphicSortAGL:
 
 
     def cbx_changed(self, event):
-        self.restart()
+        if not self.isValidQtyOfNumbers():
+            self.restartDefault()
+        else:
+            self.restart()
+
 
     def play(self):
-        self.isRunALG = False
-
-
         if self._counter_btn_play_presed == 0:
-            self.isRunALG = True
             if not self.isValidQtyOfNumbers():
-                self.screem.title("Bubble Sort Error in input NQty")
+                self.screem.title("Not Valur in NumberQTY Start with Deafult Value")
             else:
-                self.screem.title(f"Bubble Sort Default")
-        else:
-            if self.isValidQtyOfNumbers() and self._counter_btn_play_presed != 0:
-                self.initArrNumbers(int(self.txtNumbersQTY.get()))
-                self.calculateKons()
+                self.restart()
+                self.screem.title(f"Bubble Sort {self.lenArrNumbers} + PLAY")
                 self.cleanTxt()
-                self.isRunALG = True
-                self.screem.title("Bubble Sort By FelipedelosH")
-            else:
-                self.screem.title("Bubble Sort Error in input NQty")
-                self.isRunALG = False
 
-            if self.counter_resolver_alg == 0:
-                self.isRunALG = True
-        
+            self.calculateMaxIterators()
+            self._pressed_play = True
+        else:
+            if not self._pressed_pause:
+
+                if not self.isValidQtyOfNumbers():
+                    self.screem.title("Not Valur in NumberQTY")
+                    self.cleanTxt()
+                else:
+                    self.restart()
+                    self._pressed_play = True
+                    self.cleanTxt()
+                
+
+                self._pressed_pause = True
+
         self._counter_btn_play_presed = self._counter_btn_play_presed + 1
+
         
 
     def pause(self):
         self.screem.title("Burbuja by loko:PAUSE")
-        self.isRunALG = False
+        self._pressed_pause = True
+        self._pressed_play = False
 
     def restartDefault(self):
-        self.isRunALG = False
+        self._pressed_play = False
         self._iCounter = 0
         self._jCounter = 0
         k = random.randint(33, 99)
@@ -243,16 +253,16 @@ class GraphicSortAGL:
         self.showArrayNumbers()
         
     def restart(self):
-        self.isRunALG = False
+        self._pressed_play = False
         self._iCounter = 0
         self._jCounter = 0
         self._pivot0 = 0
         self._pivot1 = 0
         self.iterator = 0
-        k = len(self.arrNumbers)
+        k = self.txtNumbersQTY.get()
+        k = int(k)
         self.initArrNumbers(k)
         self.calculateKons()
-
         self.lblALG['text'] = "ALG"
         self.showArrayNumbers()
         
@@ -265,9 +275,9 @@ class GraphicSortAGL:
                 isBruteBubbleSort = str(self.txt_alg_cbx_selection.get()) == self.alg_registred[0]
                 if isBruteBubbleSort:
                     _arrCounter = 0
-                    while _arrCounter < self.lenArrNumbers and self.isRunALG:
+                    while _arrCounter < self.lenArrNumbers and self._pressed_play:
                         _itemCounter = 0
-                        while _itemCounter < self.lenArrNumbers-1 and self.isRunALG:
+                        while _itemCounter < self.lenArrNumbers-1 and self._pressed_play:
                             self._pivot0 = _itemCounter
                             self._pivot1 = _itemCounter + 1
                             if self.arrNumbers[self._pivot0] < self.arrNumbers[self._pivot1]:
@@ -282,15 +292,15 @@ class GraphicSortAGL:
 
 
                         _arrCounter = _arrCounter + 1
-                    self.isRunALG = False
+                    self._pressed_play = False
 
 
                 isOptimalBubbleSort = str(self.txt_alg_cbx_selection.get()) == self.alg_registred[1]
-                if isOptimalBubbleSort and self.isRunALG:
+                if isOptimalBubbleSort and self._pressed_play:
                     _arrCounter = 0
-                    while _arrCounter < self.lenArrNumbers:
+                    while _arrCounter < self.lenArrNumbers and self._pressed_play:
                         _itemCounter = 0
-                        while _itemCounter < self.lenArrNumbers - (_arrCounter + 1):
+                        while _itemCounter < self.lenArrNumbers - (_arrCounter + 1) and self._pressed_play:
                             self._pivot0 = _itemCounter
                             self._pivot1 = _itemCounter + 1
                             if self.arrNumbers[self._pivot0] < self.arrNumbers[self._pivot1]:
@@ -304,7 +314,7 @@ class GraphicSortAGL:
                             _itemCounter = _itemCounter + 1
 
                         _arrCounter = _arrCounter + 1
-
+                    self._pressed_play = False
 
                 sleep(0.0001)
             except:
