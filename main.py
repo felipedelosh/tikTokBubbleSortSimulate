@@ -14,6 +14,15 @@ from threading import *
 from time import sleep
 
 
+_isSystemAudioEnabled = False
+
+try:
+    import winsound
+    _isSystemAudioEnabled = False
+except:
+    print("Error: windows sound library not found.")
+ 
+
 class GraphicSortAGL:
     def __init__(self):
         self._max_x = 540 # width
@@ -114,9 +123,23 @@ class GraphicSortAGL:
         self.calculateMaxIterators()
 
     def modifyTimeSleep(self, value):
-        self.lblTimeSleep['text'] = f"Velocity = {value}%"
         k = int(value)
-        self._sleepTime = 0.01 + (0.1 * (1-(k/100)))
+        self.lblTimeSleep['text'] = f"Velocity = {value}%"
+        if k > 80:
+            self.lblTimeSleep['text'] = "Velocity = HiGh SpEed"
+        elif k > 50:
+            self.lblTimeSleep['text'] = "Velocity = Medium Speed"
+        elif k > 30:
+            self.lblTimeSleep['text'] = "Velocity = Moderate"
+        elif k > 10:
+            self.lblTimeSleep['text'] = "Velocity = Slow"
+        elif k > 2:
+            self.lblTimeSleep['text'] = "Velocity = Too Slow"
+        elif k >= 0:
+            self.lblTimeSleep['text'] = "Velocity = -272C"
+
+        self._sleepTime = 0.005 + (0.1 * (1-(k/100)))
+
 
     def initArrNumbersDefault(self):
         self.arrNumbers.clear()
@@ -156,7 +179,7 @@ class GraphicSortAGL:
             if self._pressed_play:
                 self.showArrayNumbers()
                 self.showALG()
-            self.screem.after(30, self.update_graphic)
+            self.screem.after(40, self.update_graphic)
         except:
             self.restart()
 
@@ -259,9 +282,14 @@ class GraphicSortAGL:
         self._pivot0 = 0
         self._pivot1 = 0
         self.iterator = 0
-        k = self.txtNumbersQTY.get()
-        k = int(k)
-        self.initArrNumbers(k)
+        try:
+            k = self.txtNumbersQTY.get()
+            k = int(k)
+            self.initArrNumbers(k)
+        except:
+            k = random.randint(33, 99)
+            self.initArrNumbers(k)
+
         self.calculateKons()
         self.lblALG['text'] = "ALG"
         self.showArrayNumbers()
